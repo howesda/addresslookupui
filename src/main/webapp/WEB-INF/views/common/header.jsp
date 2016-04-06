@@ -43,7 +43,4 @@
 	href="${pageContext.request.contextPath}/supportingfiles/application.css"
 	media="screen" rel="stylesheet" type="text/css">
 	
-<link
-	href="${pageContext.request.contextPath}/supportingfiles/jquery-ui.css"
-	media="screen" rel="stylesheet" type="text/css">
 </head>

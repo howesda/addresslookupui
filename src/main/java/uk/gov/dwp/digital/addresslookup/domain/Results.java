@@ -8,6 +8,23 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 public class Results {
 	
 	private List<AddressResult> results;
+	private String message;
+	
+	
+
+	/**
+	 * @return the error
+	 */
+	public String getMessage() {
+		return message;
+	}
+
+	/**
+	 * @param error the error to set
+	 */
+	public void setMessage(String message) {
+		this.message = message;
+	}
 
 	/**
 	 * @return the addresses
@@ -23,8 +40,5 @@ public class Results {
 		this.results = results;
 	}
 	
-	public String toString() {
-		return "Results [results=" + results + "]";
-	}
 
 }

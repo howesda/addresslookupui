@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import uk.gov.dwp.digital.addresslookup.common.BadRequestException;
+import uk.gov.dwp.digital.addresslookup.common.NotFoundException;
+import uk.gov.dwp.digital.addresslookup.common.UnrecoverableException;
 import uk.gov.dwp.digital.addresslookup.domain.AddressResult;
 import uk.gov.dwp.digital.addresslookup.domain.Results;
 import uk.gov.dwp.digital.addresslookup.forms.PostCodeSearchForm;
@@ -74,25 +77,27 @@ public class PostCodeController {
 	}
 	
 	private ModelAndView processSearchRequest(PostCodeSearchForm form,BindingResult bindingResult,HttpServletRequest request){
-
-		Results addresses = postCodeService.byPostcode(form.getPostCode().toUpperCase());
+		Results addresses = null;
 		
-		// If the search returns no hits, return an error
-		// If it returns one hit, emulate the actions that occur when the user clicks
-		// on one of the search results
-		// If it returns more than one result, display them in a list
-		if(addresses.getResults() == null) {
-			bindingResult.rejectValue("postCode", "postCodeNotFound");
-		} else if ( addresses.getResults().size() == 0 ){
-			bindingResult.rejectValue("postCode", "postCodeNotFound");
-		} else if ( addresses.getResults().size() == 1 ) {
-			form.setSelectedAddress(addresses.getResults().get(0));
-			form.setSelectedAddressUprn(addresses.getResults().get(0).getUprn());
-			form.setResults(null);
-		} else {
-			form.setResults(addresses.getResults());		
+		try{
+			addresses = postCodeService.byPostcode(form.getPostCode().toUpperCase());
 			
-		}
+			if ( addresses.getResults().size() == 1 ) {
+				form.setSelectedAddress(addresses.getResults().get(0));
+				form.setSelectedAddressUprn(addresses.getResults().get(0).getUprn());
+				form.setResults(null);
+			} else {
+				form.setResults(addresses.getResults());		
+				
+			}
+		} catch(NotFoundException e) {
+			bindingResult.rejectValue("postCode", "postCodeNotFound");
+		} catch (BadRequestException e) {
+			bindingResult.rejectValue("postCode", "postCodeTooShort");
+		} catch (UnrecoverableException e) {
+			e.printStackTrace();
+			bindingResult.rejectValue("postCode", "unrecoverable");
+		} 
 		
 		HttpSession session = request.getSession(true);
 		session.setAttribute("results", addresses);
