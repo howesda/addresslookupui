@@ -8,24 +8,8 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 public class Results {
 	
 	private List<AddressResult> results;
-	private String message;
+	private AddressLookupError error;
 	
-	
-
-	/**
-	 * @return the error
-	 */
-	public String getMessage() {
-		return message;
-	}
-
-	/**
-	 * @param error the error to set
-	 */
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
 	/**
 	 * @return the addresses
 	 */
@@ -38,6 +22,14 @@ public class Results {
 	 */
 	public void setResults(List<AddressResult> results) {
 		this.results = results;
+	}
+
+	public AddressLookupError getError() {
+		return error;
+	}
+
+	public void setError(AddressLookupError error) {
+		this.error = error;
 	}
 	
 

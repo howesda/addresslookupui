@@ -1,6 +1,7 @@
 package uk.gov.dwp.digital.addresslookup.dao.impl;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
@@ -19,12 +20,25 @@ import uk.gov.dwp.digital.addresslookup.domain.Results;
 
 public class PostCodeDAOImpl implements PostCodeDAO{
 	
+	private String addressLookupServiceURI = null;
+	
+	public PostCodeDAOImpl(){
+		Properties props = new Properties();
+		try {
+			props.load(PostCodeDAOImpl.class.getResourceAsStream("/app.props"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		addressLookupServiceURI = props.getProperty("address.service.uri");
+	}
+	
 	@Override
 	public Results byPostCode(String postCode) throws NotFoundException, BadRequestException, UnrecoverableException {
 		ClientConfig clientConfig = new DefaultClientConfig();
 		Client client = Client.create(clientConfig);
 		
-		WebResource wr = client.resource("http://localhost:8081/addresses/postcode/" + postCode);
+		WebResource wr = client.resource(addressLookupServiceURI + "/addresses/postcode/" + postCode);
 		
 		ClientResponse response = null;
 		try {
