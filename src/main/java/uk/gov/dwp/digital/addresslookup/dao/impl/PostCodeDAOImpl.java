@@ -1,6 +1,8 @@
 package uk.gov.dwp.digital.addresslookup.dao.impl;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Properties;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +40,14 @@ public class PostCodeDAOImpl implements PostCodeDAO{
 		ClientConfig clientConfig = new DefaultClientConfig();
 		Client client = Client.create(clientConfig);
 		
-		WebResource wr = client.resource(addressLookupServiceURI + "/addresses/postcode/" + postCode);
+		String urlEncodedPostCode;
+		try {
+			urlEncodedPostCode = URLEncoder.encode(postCode,"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new BadRequestException("Unable to process postcode " + postCode,e);
+		}
+		
+		WebResource wr = client.resource(addressLookupServiceURI + "/addresses/postcode/" + urlEncodedPostCode);
 		
 		ClientResponse response = null;
 		try {

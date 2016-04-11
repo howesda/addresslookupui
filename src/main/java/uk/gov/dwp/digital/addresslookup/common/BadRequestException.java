@@ -8,4 +8,7 @@ public class BadRequestException extends Exception {
 		super();
 	}
 
+	public BadRequestException(String msg,Exception e) {
+		super(msg,e);
+	}
 }
