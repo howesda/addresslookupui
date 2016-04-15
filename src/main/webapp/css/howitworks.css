@@ -1,0 +1,17 @@
+@CHARSET "UTF-8";
+
+/*****************************************
+Full width
+******************************************/
+#full-width #content, #full-width #global-header .header-wrapper {
+  max-width: 100%;
+  padding-left: 10px;
+  padding-right: 10px; }
+
+#full-width #global-header.with-proposition .header-wrapper .header-proposition .content {
+  margin-left: 0; }
+
+canvas { border: 1px solid black; }
+.hidden {display:none;}
+
+ 
