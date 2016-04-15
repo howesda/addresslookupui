@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Address Service</title>
+<style type="text/css">
+  canvas { border: 1px solid black; }
+</style>
+
+</head>
+<body>
+<p style="display:none"><button id="btnRest" onclick="drawRESTMessages()">REST</button><button id="btnQasV3" onclick="drawQasV3Messages()">QASv3</button><button id="btnQasV4" onclick="drawQasV4Messages()">QASv4</button></p>
+</body>
+<script lang="javascript">
+	
+			
+	var diagramBox = function(x,y,width,height,font,text,topJustify){
+		this.x = x;
+		this.y =y;
+		this.width = width;
+		this.height = height;
+		this.font = font;
+		this.text = text;
+		this.topJustify = topJustify;
+	}
+	
+	var simpleBoxHeight = 80;
+	var simpleContainerHeight = 140;
+	var horizontalGutter = 10;
+	var verticalGutter = 50;
+	
+	var restClient = new diagramBox(100, 
+			                        10, 
+			                        200, 
+			                        simpleBoxHeight,
+			                        "30px Arial",
+			                        "RESTClient");
+	var qas3Client = new diagramBox(600, 
+			                        10, 
+			                        200, 
+			                        simpleBoxHeight,
+			                        "30px Arial",
+			                        "QAS v3 Client");
+	
+	var qas4Client = new diagramBox(1100, 
+			                        10, 
+			                        200, 
+			                        simpleBoxHeight,
+			                        "30px Arial",
+			                        "QAS v4 Client");
+
+	var camelBox = new diagramBox(50, 
+			                      restClient.y + restClient.height + verticalGutter, 
+			                      1300, 
+			                      550);
+	
+	var restEndpoint = new diagramBox(100, 
+			                         camelBox.y + verticalGutter, 
+			                         300, 
+			                         simpleBoxHeight,
+			                         "30px Arial",
+			                         "Apache CXF RS");
+	var cxfEndpoint = new diagramBox(473, 
+			                         camelBox.y + verticalGutter, 
+			                         600, 
+			                         simpleBoxHeight,
+			                         "30px Arial",
+			                         "Apache CXF");
+
+
+	var restRoute = new diagramBox(camelBox.x + horizontalGutter, 
+			                       restEndpoint.y + restEndpoint.height + verticalGutter, 
+			                       400, 
+			                       simpleContainerHeight,
+			                       "30px Arial",
+			                       "Camel REST Route",
+			                       true);
+	var restPrepareParams = new diagramBox(restRoute.x + horizontalGutter, 
+			                               restRoute.y + restRoute.height - (simpleContainerHeight - 40), 
+			                               180, 
+			                               simpleBoxHeight,
+			                               "20px Arial",
+			                               "Gather Parameters");
+	var restParseResponse = new diagramBox(restRoute.x + restRoute.width - 180 - horizontalGutter, 
+			                               restRoute.y + restRoute.height - (simpleContainerHeight - 40),
+			                               180, 
+			                               simpleBoxHeight,
+			                               "20px Arial",
+			                               "Parse Response");
+	
+	var cxfv3Route = new diagramBox(camelBox.x + (camelBox.width/2) - 200, 
+			                        cxfEndpoint.y + cxfEndpoint.height + verticalGutter, 
+			                        400, 
+			                        simpleContainerHeight,
+			                        "30px Arial",
+			                        "Camel CXF QAS v3 Route",
+			                        true);
+ 	var cxfv3Endpoint = new diagramBox(cxfv3Route.x + horizontalGutter, 
+ 			                              cxfv3Route.y + cxfv3Route.height - (simpleContainerHeight - 40), 
+			                              180, 
+			                              simpleBoxHeight,
+			                              "20px Arial",
+			                              "Gather Parameters");
+	var cxfv3ParseResponse = new diagramBox(cxfv3Route.x + cxfv3Route.width - 180 - horizontalGutter, 
+			                              cxfv3Route.y + cxfv3Route.height - (simpleContainerHeight - 40),
+			                              180, 
+			                              simpleBoxHeight,
+			                              "20px Arial",
+			                              "Parse Response");
+
+	var cxfv4Route = new diagramBox(camelBox.x + camelBox.width - horizontalGutter - 400, 
+			                        cxfEndpoint.y + cxfEndpoint.height + verticalGutter, 
+			                        400, 
+			                        simpleContainerHeight,
+			                        "30px Arial",
+			                        "Camel CXF QAS v4 Route",
+			                        true);
+
+ 	var cxfv4Endpoint = new diagramBox(cxfv4Route.x + horizontalGutter, 
+                                       cxfv4Route.y + cxfv4Route.height - (simpleContainerHeight - 40), 
+                                       180, 
+                                       simpleBoxHeight,
+                                       "20px Arial",
+                                       "Gather Parameters");
+	var cxfv4ParseResponse = new diagramBox(cxfv4Route.x + cxfv4Route.width - 180 - horizontalGutter, 
+                                          cxfv4Route.y + cxfv4Route.height - (simpleContainerHeight - 40),
+                                          180, 
+                                          simpleBoxHeight,
+                                          "20px Arial",
+                                          "Parse Response");
+	
+	var commonRoute = new diagramBox((camelBox.x + camelBox.width) / 2 - 300,
+			                         restRoute.y + restRoute.height + verticalGutter, 
+			                         600, 
+			                         simpleContainerHeight,
+			                         "30px Arial",
+			                         "Camel Common Route",
+			                         true);
+	var callToAddressLookupService = new diagramBox(commonRoute.x + horizontalGutter, 
+			                                        commonRoute.y + commonRoute.height - (simpleContainerHeight - 40), 
+			                                        250, 
+			                                        simpleBoxHeight,
+			                                        "20px Arial",
+			                                        "Call to Address Lookup");
+	var responseUnmarshallProcess = new diagramBox(commonRoute.x + commonRoute.width - 250 - horizontalGutter, 
+			                                       commonRoute.y + commonRoute.height - (simpleContainerHeight - 40),
+			                                       250, 
+			                                       simpleBoxHeight,
+			                                       "20px Arial",
+			                                       "Unmarshall Response");
+	
+	var addressLookupService = new diagramBox((camelBox.x + camelBox.width) / 2 - 180, 
+                                             camelBox.y + camelBox.height + verticalGutter,
+                                             360, 
+                                             simpleBoxHeight,
+            	                             "30px Arial",
+                                             "Address Lookup Service");
+
+	var canvas;
+	var ctx;
+	var createCanvas = function(){
+		canvas = document.createElement("canvas");
+		canvas.width = ( 2 * camelBox.x ) + camelBox.width;
+		canvas.height = addressLookupService.y + addressLookupService.height + verticalGutter;
+		canvas.id = "canvas";
+		document.getElementsByTagName('body')[0].appendChild(canvas);
+		ctx = canvas.getContext('2d');	
+		return canvas;
+
+	}
+	canvas = createCanvas();
+	
+	
+	var writeCommentary = function(commentary){
+		
+		ctx.clearRect(camelBox.x+180,camelBox.y+1,800,30);
+		var textDetails = ctx.measureText(commentary);
+		var xMidPoint = ( camelBox.width / 2 );
+				
+		ctx.fillStyle = "red";
+		ctx.font = "20px Times New Roman bold";
+		ctx.fillText(commentary,xMidPoint - ( textDetails.width / 2 ), camelBox.y + 20);		
+	}
+	
+	var drawBox = function(boxDetails){
+		ctx.strokeRect(boxDetails.x, boxDetails.y, boxDetails.width, boxDetails.height); 
+		if ( boxDetails.font ){
+			ctx.font = boxDetails.font;
+		}
+		
+		if ( boxDetails.text ){
+			var textDetails = ctx.measureText(boxDetails.text);
+			var xMidPoint = ( boxDetails.width / 2 ) + boxDetails.x;
+			if ( boxDetails.topJustify){
+				var yMidPoint = boxDetails.y + 23;
+			} else {
+				var yMidPoint = ( boxDetails.height / 2 ) + boxDetails.y;
+			}
+			
+			ctx.fillText(boxDetails.text,xMidPoint - ( textDetails.width / 2 ), yMidPoint + 5);
+		}
+	}
+	
+	var drawLineDown = function(from,to){
+		return lerp(from.x + (from.width/2),from.y + from.height,to.x + ( to.width / 2 ),to.y);
+
+	}
+	
+	
+	var drawLineUp = function(from,to){
+		return lerp(from.x + (from.width/2),from.y,to.x + ( to.width / 2 ),to.y + to.height)
+	}
+
+	
+	var lerp = function(startX,startY,endX,endY,amount){
+	  return new Promise(function(resolve, reject) {
+
+	  	var intervalMarker = setInterval(function(){
+	    	if (amount !== 1) {
+	    		if ( !amount) {
+	    			amount = 0;
+	    		}
+
+	    		amountIncrement = 0.05;
+	    	    amount += amountIncrement; // change to alter duration
+	    	
+	    	    if (amount >= 1){
+	    	    	amount = 1;
+	    	    }
+	    	    ctx.moveTo(startX + (endX - startX) * (amount - amountIncrement), startY + (endY - startY) * (amount - amountIncrement));
+	    	    ctx.lineTo(startX + (endX - startX) * amount, startY + (endY - startY) * amount);
+	    	    ctx.stroke();
+	    	} else {
+	    		clearInterval(intervalMarker);
+	    		resolve();
+	    		return;
+	    	}
+	  	},100);
+
+	 });
+	}
+	
+	var drawrestClient = function(){
+		drawBox(restClient);
+/* 		var restClientimg = new Image();
+		restClientimg.src = 'images/AddressLookupUI.png';
+		restClientimg.onload = function(){
+			ctx.drawImage(restClientimg,restClient.x,restClient.y,restClient.width,restClient.height);
+		} */
+	}
+	var drawQasv3Client = function(){
+		drawBox(qas3Client);
+
+	}
+	
+	var drawQasv4Client = function(){
+		drawBox(qas4Client);
+
+	}
+	
+	var drawCamelBox = function(){
+		drawBox(camelBox);
+		
+		var camel = new Image();
+		camel.src = 'images/camel.png';
+		camel.onload = function(){
+			ctx.drawImage(camel,camelBox.x + camelBox.width - 200,camelBox.y + 5,190,80);
+		}	
+	}
+	
+	var drawRestEndpoint = function(){
+		drawBox(restEndpoint);
+	}
+	
+	var drawCXFEndpoint = function(){
+		drawBox(cxfEndpoint);
+	}
+		
+	var drawRestRoute = function(){
+		drawBox(restRoute);
+	}
+	
+	var drawQasv3Route = function(){
+		drawBox(cxfv3Route);
+	}
+	
+	var drawQasv4Route = function(){
+		drawBox(cxfv4Route);
+	}
+	
+	var drawCommonRoute = function(){
+		drawBox(commonRoute);
+	}
+
+
+	var drawCallToAddressLookupService = function(){
+		drawBox(callToAddressLookupService);
+	}
+	
+	
+	var drawAddressLookupService = function(){
+		drawBox(addressLookupService);
+	}
+
+
+	var drawResponseUnmarshallProcess = function(){
+		drawBox(responseUnmarshallProcess);
+	}
+	
+	var drawRestPrepareParams = function(){
+		drawBox(restPrepareParams);
+	}
+		
+	var drawcxfv3Endpoint = function(){
+		drawBox(cxfv3Endpoint);
+	}
+	
+	var drawcxfv4Endpoint = function(){
+		drawBox(cxfv4Endpoint);
+	}
+	var drawRestParseResponse = function(){
+		drawBox(restParseResponse);
+	}
+
+	var drawcxfv3ParseResponse = function(){
+		drawBox(cxfv3ParseResponse);
+	}
+	
+	var drawcxfv4ParseResponse = function(){
+		drawBox(cxfv4ParseResponse);
+	}
+	
+	var connectrestClientToCXFRS = function(){
+		writeCommentary("REST over HTTP(S)")
+		return drawLineDown(restClient,restEndpoint);
+	}
+	
+	var connectCXFRStoPrepareParams = function(){
+		writeCommentary("Parse Parameters in to internal format");
+		return drawLineDown(restEndpoint,restPrepareParams);
+		
+	}
+	
+	var connectPrepareParamsToCallToAddressService = function(){
+		writeCommentary("Pass Parameters to common prpoces that call address lookup");
+		return drawLineDown(restPrepareParams,callToAddressLookupService)
+	}
+	
+	var connectCallToAddressServiceToAddressService = function(){
+		writeCommentary("Call Address Lookup");
+		return drawLineDown(callToAddressLookupService,addressLookupService)		
+	}
+	
+	var connectAddressServiceToUnmarshallResponse = function(){
+		writeCommentary("Transform response into internal format");
+		return drawLineUp(addressLookupService,responseUnmarshallProcess)		
+	}
+	
+	var connectUnmarshallResponseToParseResponse = function(){
+		writeCommentary("Format response for specific client");
+		return drawLineUp(responseUnmarshallProcess,restParseResponse)		
+	}
+	
+	var connectParseResponseToCXFRS = function(){
+		writeCommentary("Return response to client");
+		return drawLineUp(restParseResponse,restEndpoint)		
+	}
+	
+	var connectXFRStorestClient = function(){
+		return drawLineUp(restEndpoint,restClient)		
+	}
+	
+	var connectQasV3ToCXF = function(){
+		writeCommentary("SOAP over HTTP(S)")
+		return drawLineDown(qas3Client,cxfEndpoint);
+	}
+	
+	var connectQasV4ToCXF = function(){
+		writeCommentary("SOAP over HTTP(S)")
+		return drawLineDown(qas4Client,cxfEndpoint);
+	}	
+
+	var connectCXFtoQasv3PrepareParams = function(){
+		writeCommentary("Parse Parameters in to internal format");
+		return drawLineDown(cxfEndpoint,cxfv3Endpoint);	
+	}
+	
+	var connectCXFtoQasv4PrepareParams = function(){
+		writeCommentary("Parse Parameters in to internal format");
+		return drawLineDown(cxfEndpoint,cxfv4Endpoint);	
+	}
+
+	var connectQasv3PrepareParamsToCallToAddressService = function(){
+		writeCommentary("Pass Parameters to common prpoces that call address lookup");
+		return drawLineDown(cxfv3Endpoint,callToAddressLookupService)
+	}
+	
+	var connectQasv4PrepareParamsToCallToAddressService = function(){
+		writeCommentary("Pass Parameters to common prpoces that call address lookup");
+		return drawLineDown(cxfv4Endpoint,callToAddressLookupService)
+	}
+	
+	var connectUnmarshallResponseToQasv3ParseResponse = function(){
+		writeCommentary("Format response for specific client");
+		return drawLineUp(responseUnmarshallProcess,cxfv3ParseResponse)		
+	}
+	
+	var connectUnmarshallResponseToQasv4ParseResponse = function(){
+		writeCommentary("Format response for specific client");
+		return drawLineUp(responseUnmarshallProcess,cxfv4ParseResponse)		
+	}
+	
+	var connectQasv3ParseResponseToCXF = function(){
+		writeCommentary("Return response to client");
+		return drawLineUp(cxfv3ParseResponse,cxfEndpoint)		
+	}
+	
+	var connectQasv4ParseResponseToCXF = function(){
+		writeCommentary("Return response to client");
+		return drawLineUp(cxfv4ParseResponse,cxfEndpoint)		
+	}
+	
+	var connectCXFtoQasV3Client = function(){
+		return drawLineUp(cxfEndpoint,qas3Client)		
+	}
+	
+	var connectCXFtoQasV4Client = function(){
+		return drawLineUp(cxfEndpoint,qas4Client)		
+	}
+	
+	var drawArchitectureBoxes = function(){
+		drawrestClient();
+		
+		drawQasv3Client();
+		
+		drawQasv4Client();
+		
+		drawCamelBox();
+		
+		drawRestEndpoint();
+		
+		drawCXFEndpoint()
+		
+		drawRestRoute();
+		
+		drawQasv3Route();
+		
+		drawQasv4Route();
+		
+		drawCommonRoute();
+		
+		drawCallToAddressLookupService();
+		
+		drawAddressLookupService();
+	
+		drawResponseUnmarshallProcess();
+		
+		drawRestPrepareParams();
+		
+		drawcxfv3Endpoint();
+
+		drawcxfv4Endpoint();
+		
+		drawRestParseResponse();
+		
+		drawcxfv3ParseResponse();
+		
+		drawcxfv4ParseResponse();
+	}
+	
+	var drawRESTMessages = function(){
+		connectrestClientToCXFRS()
+			.then(function () {
+				return connectCXFRStoPrepareParams();
+			})
+			.then(function(){
+				return connectPrepareParamsToCallToAddressService();
+			})
+			.then(function(){
+				return connectCallToAddressServiceToAddressService();
+			})
+			.then(function(){
+				return connectAddressServiceToUnmarshallResponse();
+			})
+			.then(function(){
+				return connectUnmarshallResponseToParseResponse();
+			})
+			.then(function(){
+				return connectParseResponseToCXFRS();
+			})	
+			.then(function(){
+				return connectXFRStorestClient();
+			}).
+			then(function(){
+				writeCommentary("");
+				document.getElementsByTagName('body')[0].removeChild(canvas);
+				createCanvas();
+				drawArchitectureBoxes();
+				document.getElementById("btnQasV3").click();
+
+			});
+	}
+	
+	var drawQasV3Messages = function(){
+		return new Promise(function(resolve,reject){
+		connectQasV3ToCXF()
+			.then(function () {
+				return connectCXFtoQasv3PrepareParams();
+			})
+			.then(function(){
+				return connectQasv3PrepareParamsToCallToAddressService();
+			})
+			.then(function(){
+				return connectCallToAddressServiceToAddressService();
+			})
+			.then(function(){
+				return connectAddressServiceToUnmarshallResponse();
+			})
+			.then(function(){
+				return connectUnmarshallResponseToQasv3ParseResponse();
+			})
+			.then(function(){
+				return connectQasv3ParseResponseToCXF();
+			})	
+			.then(function(){
+				return connectCXFtoQasV3Client();
+			}).
+			then(function(){
+				writeCommentary("");
+				document.getElementsByTagName('body')[0].removeChild(canvas);
+				createCanvas();
+				drawArchitectureBoxes();
+				document.getElementById("btnQasV4").click();
+
+			});
+	});
+	}
+	
+	
+	var drawQasV4Messages = function(){
+		return new Promise(function(resolve,reject){
+		connectQasV4ToCXF()
+			.then(function () {
+				return connectCXFtoQasv4PrepareParams();
+			})
+			.then(function(){
+				return connectQasv4PrepareParamsToCallToAddressService();
+			})
+			.then(function(){
+				return connectCallToAddressServiceToAddressService();
+			})
+			.then(function(){
+				return connectAddressServiceToUnmarshallResponse();
+			})
+			.then(function(){
+				return connectUnmarshallResponseToQasv4ParseResponse();
+			})
+			.then(function(){
+				return connectQasv4ParseResponseToCXF();
+			})	
+			.then(function(){
+				return connectCXFtoQasV4Client();
+			}).
+			then(function(){
+				writeCommentary("");
+				document.getElementsByTagName('body')[0].removeChild(canvas);
+				createCanvas();
+				drawArchitectureBoxes();
+				document.getElementById("btnRest").click();
+
+			});
+	});
+	}
+	drawArchitectureBoxes();
+	document.getElementById("btnRest").click();
+
+</script>
+</html>
