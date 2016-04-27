@@ -1,6 +1,9 @@
 package uk.gov.dwp.digital.addresslookup.dao.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Properties;
@@ -24,14 +27,27 @@ public class PostCodeDAOImpl implements PostCodeDAO{
 	
 	private String addressLookupServiceURI = null;
 	
+	private final static String defaultPropsFileLocation = "/app.props";
+	
 	public PostCodeDAOImpl(){
+		
+		String propsFileLocation = System.getProperty("propsFile");
 		Properties props = new Properties();
 		try {
-			props.load(PostCodeDAOImpl.class.getResourceAsStream("/app.props"));
+
+			InputStream is = null;
+			if ( propsFileLocation == null ){
+				is = PostCodeDAOImpl.class.getResourceAsStream(defaultPropsFileLocation);
+			} else {
+				is = new FileInputStream(new File(propsFileLocation));
+			}
+				
+			props.load(is);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+		
 		addressLookupServiceURI = props.getProperty("address.service.uri");
 	}
 	
