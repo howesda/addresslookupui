@@ -1,15 +1,11 @@
 package uk.gov.dwp.digital.addresslookup.controllers;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-
 import uk.gov.dwp.digital.addresslookup.common.BadRequestException;
 import uk.gov.dwp.digital.addresslookup.common.NotFoundException;
 import uk.gov.dwp.digital.addresslookup.common.UnrecoverableException;
@@ -18,6 +14,9 @@ import uk.gov.dwp.digital.addresslookup.domain.Results;
 import uk.gov.dwp.digital.addresslookup.forms.PostCodeSearchForm;
 import uk.gov.dwp.digital.addresslookup.forms.PostCodeSearchForm.AddressSelected;
 import uk.gov.dwp.digital.addresslookup.service.PostCodeService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("postcode")
@@ -93,7 +92,7 @@ public class PostCodeController {
 		} catch(NotFoundException e) {
 			bindingResult.rejectValue("postCode", "postCodeNotFound");
 		} catch (BadRequestException e) {
-			bindingResult.rejectValue("postCode", "postCodeTooShort");
+			bindingResult.rejectValue("postCode", "postCodeInvalid");
 		} catch (UnrecoverableException e) {
 			e.printStackTrace();
 			bindingResult.rejectValue("postCode", "unrecoverable");
