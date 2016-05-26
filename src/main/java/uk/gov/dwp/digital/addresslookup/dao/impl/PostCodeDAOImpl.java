@@ -1,27 +1,18 @@
 package uk.gov.dwp.digital.addresslookup.dao.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Properties;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.*;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-
 import uk.gov.dwp.digital.addresslookup.common.BadRequestException;
 import uk.gov.dwp.digital.addresslookup.common.NotFoundException;
 import uk.gov.dwp.digital.addresslookup.common.UnrecoverableException;
 import uk.gov.dwp.digital.addresslookup.dao.PostCodeDAO;
 import uk.gov.dwp.digital.addresslookup.domain.Results;
+
+import java.io.*;
+import java.net.URLEncoder;
+import java.util.Properties;
 
 public class PostCodeDAOImpl implements PostCodeDAO{
 	
@@ -58,7 +49,7 @@ public class PostCodeDAOImpl implements PostCodeDAO{
 		
 		String urlEncodedPostCode;
 		try {
-			urlEncodedPostCode = URLEncoder.encode(postCode,"UTF-8");
+			urlEncodedPostCode = URLEncoder.encode(postCode.replaceAll("\\s+", ""),"UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			throw new BadRequestException("Unable to process postcode " + postCode,e);
 		}
