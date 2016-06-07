@@ -26,7 +26,7 @@ public class PostCodeDAOImpl implements PostCodeDAO{
 	
 	public PostCodeDAOImpl(){
 		
-		addressLookupServiceURI = System.getenv("address.service.uri");
+		addressLookupServiceURI = System.getenv("ADDRESS_SERVICE_URI");
 	}
 	
 	@Override
