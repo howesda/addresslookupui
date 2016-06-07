@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uk.gov.dwp.digital.addresslookup.domain.AddressResult;
-import uk.gov.dwp.digital.addresslookup.domain.Results;
 
 public class PostCodeSearchResultAdapter {
 	

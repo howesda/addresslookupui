@@ -7,7 +7,6 @@ import javax.validation.constraints.Min;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import uk.gov.dwp.digital.addresslookup.domain.AddressResult;
-import uk.gov.dwp.digital.addresslookup.domain.Results;
 
 public class PostCodeSearchForm {
 	
